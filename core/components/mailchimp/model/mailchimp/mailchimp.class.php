@@ -34,12 +34,6 @@
 		 * @var Array.
 		 */
 		public $config = array();
-		
-		/**
-		 * @acces protected.
-		 * @var Array.
-		 */
-	    protected $options = null;
 
 		/**
 		 * @acces public.
@@ -55,8 +49,8 @@
 		
 			$this->config = array_merge(array(
 				'namespace'				=> $this->modx->getOption('namespace', $config, 'mailchimp'),
-				'helpurl'				=> $this->modx->getOption('helpurl', $config, 'mailchimp'),
-				'language'				=> 'elements:default',
+				'helpurl'				=> $this->modx->getOption('namespace', $config, 'mailchimp'),
+				'language'				=> 'mailchimp:default',
 				'base_path'				=> $corePath,
 				'core_path' 			=> $corePath,
 				'model_path' 			=> $corePath.'model/',
@@ -66,55 +60,18 @@
 				'cronjobs_path' 		=> $corePath.'elements/cronjobs/',
 				'plugins_path' 			=> $corePath.'elements/plugins/',
 				'snippets_path' 		=> $corePath.'elements/snippets/',
+				'templates_path' 		=> $corePath.'templates/',
 				'assets_path' 			=> $assetsPath,
 				'js_url' 				=> $assetsUrl.'js/',
 				'css_url' 				=> $assetsUrl.'css/',
 				'assets_url' 			=> $assetsUrl,
-				'connector_url'			=> $assetsUrl.'connector.php'
+				'connector_url'			=> $assetsUrl.'connector.php',
+				'api_key'				=> $this->modx->getOption('mailchimp.api_key', null, ''),
+				'api_endpoint'			=> $this->modx->getOption('mailchimp.api_endpoint', null, '')
 			), $config);
 			
 			$this->modx->addPackage('mailchimp', $this->config['model_path']);
 		}
-		
-		/**
-	     * @acces protected.
-	     * @return Boolean.
-	     */
-	    protected function setOptions() {
-	        $options = $this->modx->getCollection('modSystemSetting', array(
-	        	'namespace' => $this->config['namespace']
-	        ));
-	
-	        foreach($options as $option) {
-	            $value = $option->get('value');
-	            
-	            if (false !== strpos($value, ',')) {
-	                $value = explode(',', trim($value));
-	            }
-	
-	            $this->options[$option->get('key')] = $value;
-	        }
-	
-	        return true;
-	    }
-	    
-	    /**
-	     * @acces protected.
-	     * @param String $key.
-	     * @param Mixed $default.
-	     * @return Mixed.
-	     */
-	    public function getOption($key, $default = false) {
-	        if (null === $this->options) {
-	            $this->setOptions();
-	        }
-	
-	        if (isset($this->options[$key])) {
-	            return $this->options[$key];
-	        }
-	
-	        return $default;
-	    }
 		
 		/**
 		 * @acces public.
@@ -123,17 +80,22 @@
 		 */
 		public function subscribe($properties = array()) {
 			if (false !== ($values = $this->modx->getOption('values', $properties, false))) {
-				$params = array();
+				$params = array(
+					'merge_vars' => array()
+				);
 				
 				if (!empty($email = $this->modx->getOption('email', $values, ''))) {
-					$params['email'] = array('email' => $email);
-				}
-
-				if  ($this->modx->getOption('name', $values) && $this->modx->getOption('lastname', $values)) {
-					$params['merge_vars'] = array(
-						'FNAME' => $this->modx->getOption('name', $values),
-						'LNAME' => $this->modx->getOption('lastname', $values)
+					$params['email'] = array(
+						'email' => $email
 					);
+				}
+				
+				if ($this->modx->getOption('name', $values)) {
+					$params['merge_vars']['FNAME'] = $this->modx->getOption('name', $values);
+				}
+				
+				if ($this->modx->getOption('lastname', $values)) {
+					$params['merge_vars']['LNAME'] = $this->modx->getOption('lastname', $values);
 				}
 		
 				if ($list = $this->modx->getOption('list', $values)) {
@@ -143,11 +105,12 @@
 				}
 				
 				$output = $this->callApi('lists/subscribe', array_merge(array(
-					'double_optin'      => false,
-					'update_existing'   => true,
-					'replace_interests' => false,
-					'send_welcome'      => (boolean) $this->modx->getOption('welcome', $properties, false),
-					'apikey' 			=> $this->getOption('mailchimp.api_key')
+					'email_type'		=> $this->modx->getOption('email_type', $properties, 'html'),
+					'double_optin'      => (boolean) $this->modx->getOption('double_optin', $properties, false),
+					'update_existing'   => (boolean) $this->modx->getOption('update_existing', $properties, true),
+					'replace_interests' => (boolean) $this->modx->getOption('replace_interests', $properties, false),
+					'send_welcome'      => (boolean) $this->modx->getOption('send_welcome', $properties, false),
+					'apikey' 			=> $this->config['api_key']
 				), $params));
 				
 				if (false !== $output) {
@@ -168,7 +131,9 @@
 				$params = array();
 				
 				if (!empty($email = $this->modx->getOption('email', $values, ''))) {
-					$params['email'] = array('email' => $email);
+					$params['email'] = array(
+						'email' => $email
+					);
 				}
 
 				if ($list = $this->modx->getOption('list', $values)) {
@@ -178,9 +143,10 @@
 				}
 				
 				$output = $this->callApi('lists/unsubscribe', array_merge(array(
-					'delete_member'     => false,
-					'send_goodbye'      => (boolean) $this->modx->getOption('goodbye', $properties, false),
-					'apikey' 			=> $this->getOption('mailchimp.api_key')
+					'delete_member'     => (boolean) $this->modx->getOption('delete_member', $properties, true),
+					'send_goodbye'      => (boolean) $this->modx->getOption('send_goodbye', $properties, false),
+					'send_notify '		=> (boolean) $this->modx->getOption('send_notify', $properties, false),
+					'apikey' 			=> $this->config['api_key']
 				), $params));
 				
 				if (false !== $output) {
@@ -199,9 +165,9 @@
 		 * @return String.
 		 */
 	    protected function callApi($method, $params = array(), $type = 'POST') {
-		    list($key, $datacentre) = explode('-', $this->getOption('mailchimp.api_key'));
+		    list($key, $datacentre) = explode('-', $this->config['api_key']);
 		    
-		    $url = rtrim(str_replace('<dc>', $datacentre, $this->getOption('mailchimp.api_endpoint')), '/');
+		    $url = rtrim(str_replace('<dc>', $datacentre, $this->config['api_endpoint']), '/');
 		    
 		    $curl = curl_init();
 		    
@@ -219,7 +185,7 @@
 					
 					$response 	= curl_exec($curl);
 					$info		= curl_getinfo($curl);
-				
+
 					if (!isset($info['http_code']) || '200' != $info['http_code']) {
 						return false;
 					}

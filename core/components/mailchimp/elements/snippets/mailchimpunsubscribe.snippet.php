@@ -1,5 +1,5 @@
 <?php
-
+	
 	/**
 	 * MailChimp
 	 *
@@ -22,27 +22,35 @@
 	 * Suite 330, Boston, MA 02111-1307 USA
 	 */
 
-    $mailChimp = $modx->getService('mailchimp', 'MailChimp', $modx->getOption('mailchimp.core_path', null, $modx->getOption('core_path').'components/mailchimp/').'model/mailchimp/');
-
-	$unsubscribe = false; 
-
-	switch($prefix) {
-	    case 'After':
-			if ($form->isValid()) {
-				$properties = array(
-					'values'		=> $form->getValues(),
-					'list'			=> $modx->getOption('mailChimpList', $form->extensionScriptProperties),
-					'goodbye'       => $modx->getOption('mailChimpGoodbye', $form->extensionScriptProperties)
-				);
-
-				if (false === ($unsubscribe = $mailChimp->unsubscribe($properties))) {
-					$form->getValidator()->setBulkError('extension_mailchimp_unsubscribe');
-				}
-			}
-
-			break;
-	}
-
-	return $unsubscribe;
+    if ($modx->loadClass('MailChimp', $modx->getOption('mailchimp.core_path', null, $modx->getOption('core_path').'components/mailchimp/').'model/mailchimp/', true, true)) {
+        $mailChimp = new MailChimp($modx);    
 	
+	    if ($mailChimp instanceOf MailChimp) {
+        	$unsubscribe = false; 
+        
+        	switch($prefix) {
+        	    case 'After':
+        			if ($form->getValidator()->isValid()) {
+        				$properties = array(
+        					'values'		=> $form->getValues(),
+        					'list'			=> $modx->getOption('mailChimpList', $form->properties),
+        					'delete_member'	=> $modx->getOption('mailChimpDeleteMember', $form->properties, $modx->getOption('deleteMember', $scriptProperties)),
+        					'send_goodbye'  => $modx->getOption('mailChimpSendGoodBye', $form->properties, $modx->getOption('sendGoodBye', $scriptProperties)),
+        					'send_notify'  	=> $modx->getOption('mailChimpSendNotify', $form->properties, $modx->getOption('sendNotify', $scriptProperties))
+        				);
+        
+        				if (false === ($unsubscribe = $mailChimp->unsubscribe($properties))) {
+        					$form->getValidator()->setBulkOutput($modx->lexicon('mailchimp.unsubscribe_error'));
+        				}
+        			}
+        
+        			break;
+        	}
+        
+        	return $unsubscribe;
+	    }
+    }
+    
+    return false;
+    
 ?>

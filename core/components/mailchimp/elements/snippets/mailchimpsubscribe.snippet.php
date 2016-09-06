@@ -1,5 +1,5 @@
 <?php
-
+	
 	/**
 	 * MailChimp
 	 *
@@ -22,27 +22,37 @@
 	 * Suite 330, Boston, MA 02111-1307 USA
 	 */
 
-    $mailChimp = $modx->getService('mailchimp', 'MailChimp', $modx->getOption('mailchimp.core_path', null, $modx->getOption('core_path').'components/mailchimp/').'model/mailchimp/');
-
-	$subscribe = false; 
-
-	switch($prefix) {
-	    case 'After':
-			if ($form->isValid()) {
-				$properties = array(
-					'values'		=> $form->getValues(),
-					'list'			=> $modx->getOption('mailChimpList', $form->extensionScriptProperties),
-					'welcome'       => $modx->getOption('mailChimpWelcome', $form->extensionScriptProperties)
-				);
-
-				if (false === ($subscribe = $mailChimp->subscribe($properties))) {
-					$form->getValidator()->setBulkError('extension_mailchimp_subscribe');
-				}
-			}
-
-			break;
-	}
-
-	return $subscribe;
+    if ($modx->loadClass('MailChimp', $modx->getOption('mailchimp.core_path', null, $modx->getOption('core_path').'components/mailchimp/').'model/mailchimp/', true, true)) {
+        $mailChimp = new MailChimp($modx);    
 	
+	    if ($mailChimp instanceOf MailChimp) {
+        	$subscribe = false; 
+        
+        	switch($prefix) {
+        	    case 'After':
+        			if ($form->getValidator()->isValid()) {
+        				$properties = array(
+        					'values'			=> $form->getValues(),
+        					'list'				=> $modx->getOption('mailChimpList', $form->properties),
+        					'email_type'		=> $modx->getOption('mailChimpEmailType', $form->properties, $modx->getOption('emailType', $scriptProperties)),
+        					'double_optin'		=> $modx->getOption('mailChimpDoubleOptin', $form->properties, $modx->getOption('doubleOptin', $scriptProperties)),
+        					'update_existing'	=> $modx->getOption('mailChimpUpdateExisting', $form->properties, $modx->getOption('updateExisting', $scriptProperties)),
+        					'replace_interests'	=> $modx->getOption('mailChimpReplaceInterests', $form->properties, $modx->getOption('replaceInterests', $scriptProperties)),
+        					'send_welcome'  	=> $modx->getOption('mailChimpSendWelcome', $form->properties, $modx->getOption('sendWelcome', $scriptProperties))
+        				);
+
+        				if (false === ($subscribe = $mailChimp->subscribe($properties))) {
+        					$form->getValidator()->setBulkOutput($modx->lexicon('mailchimp.subscribe_error'));
+        				}
+        			}
+        
+        			break;
+        	}
+        
+        	return $subscribe;
+	    }
+    }
+    
+    return false;
+    
 ?>

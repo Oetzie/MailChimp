@@ -17,11 +17,11 @@
 	    'namespace' 	=> PKG_NAME_LOWER,
 	    'parent' 		=> 'oetzie',
 	    'description' 	=> PKG_NAME_LOWER.'.desc',
-	    'icon' 			=> '',
+	    'icon' 			=> 'arrow-right',
 	    'menuindex' 	=> 0,
 	    'params' 		=> '',
 	    'handler' 		=> '',
-	    'permissions'	=> ''
+	    'permissions'	=> 'administrator'
 	), '', true, true);
 	
 	$menu->addOne($action);

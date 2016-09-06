@@ -5,7 +5,7 @@
 	$settings[0] = $modx->newObject('modSystemSetting');
 	$settings[0]->fromArray(array(
 		'key' 		=> PKG_NAME_LOWER.'.api_endpoint',
-		'value' 	=> '',
+		'value' 	=> 'https://<dc>.api.mailchimp.com/2.0/',
 		'xtype' 	=> 'textfield',
 		'namespace' => PKG_NAME_LOWER,
 		'area' 		=> PKG_NAME_LOWER
