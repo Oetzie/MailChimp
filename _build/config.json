@@ -1,0 +1,28 @@
+{
+    "name": "MailChimp",
+    "lowCaseName": "mailchimp",
+    "description": "A MailChimp subscribe solution for MODX Revolution.",
+    "author": "Oetzie.nl",
+    "version": "1.1.0-pl",
+    "package":{
+        "elements": {
+            "snippets": [{
+                "name": "FormMailChimp",
+                "file": "formmailchimp.snippet.php"
+            }]
+        },
+        "systemSettings": [{
+            "key": "api_endpoint",
+            "value": "https://<dc>.api.mailchimp.com/3.0/",
+            "area": "mailchimp"
+        },{
+            "key": "api_key",
+            "area": "mailchimp"
+        }]
+    },
+    "build":{
+        "readme": "docs/readme.txt",
+        "license": "docs/license.txt",
+        "changelog": "docs/changelog.txt"
+    }
+}

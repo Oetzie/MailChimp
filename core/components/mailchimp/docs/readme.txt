@@ -1,9 +1,7 @@
 ----------------------
 MailChimp
 ----------------------
-Version: 1.0.1
+Version: 1.1.0
 Author: Oene Tjeerd de Bruin
-Contact: info@oetzie.nl
+Contact: modx@oetzie.nl
 ----------------------
-
-MailChimp (un)subscribe snippet.

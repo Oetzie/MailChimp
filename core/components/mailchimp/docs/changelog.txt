@@ -3,11 +3,17 @@ MailChimp
 ----------------------
 
 ----------------------
+Version: 1.1.0
+Released: 2019-11-19
+----------------------
+- New version
+- MailChimp API v3
+
+----------------------
 Version: 1.0.1
 Released: 2016-09-06
 ----------------------
 - New version
-	- New code
 
 ----------------------
 Version: 1.0.0
