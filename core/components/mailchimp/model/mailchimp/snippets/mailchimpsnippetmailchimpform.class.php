@@ -8,7 +8,7 @@
 
 require_once dirname(__DIR__) . '/mailchimpsnippets.class.php';
 
-class MailChimpSnippetFormMailChimp extends MailChimpSnippets
+class MailChimpSnippetMailChimpForm extends MailChimpSnippets
 {
     /**
      * @access public.
@@ -24,7 +24,8 @@ class MailChimpSnippetFormMailChimp extends MailChimpSnippets
             'PHONE'         => 'phone'
         ],
         'aliasFields'   => [
-            'email_type'    => 'mailchimp_email_type'
+            'email'         => 'email',
+            'email_type'    => 'email_type'
         ],
         'optin'         => true,
         'optinField'    => false
@@ -40,10 +41,12 @@ class MailChimpSnippetFormMailChimp extends MailChimpSnippets
     public function run($event, array $properties = [], $form)
     {
         if ($event === FormEvents::VALIDATE_SUCCESS) {
-            $this->setProperties($properties);
+            $this->setProperties($this->getFormattedProperties($properties));
+
+            $aliasFields = $this->getProperty('aliasFields');
 
             if ($this->getProperty('type') === 'subscribe') {
-                $email = $form->getCollection()->getValue('email');
+                $email = $form->getCollection()->getValue($aliasFields['email'] ?: 'email');
                 $optin = $form->getCollection()->getValue($this->getProperty('optinField'));
 
                 if (!empty($email) && (!empty($optin) || empty($this->getProperty('optinField')))) {
@@ -68,7 +71,7 @@ class MailChimpSnippetFormMailChimp extends MailChimpSnippets
                         }
                     }
 
-                    foreach ((array) $this->getProperty('aliasFields') as $key => $field) {
+                    foreach ((array) $aliasFields as $key => $field) {
                         $value = $form->getCollection()->getValue($field);
 
                         if ($value) {
@@ -89,7 +92,7 @@ class MailChimpSnippetFormMailChimp extends MailChimpSnippets
             }
 
             if ($this->getProperty('type') === 'unsubscribe') {
-                $email = $form->getCollection()->getValue('email');
+                $email = $form->getCollection()->getValue($aliasFields['email'] ?: 'email');
                 $optin = $form->getCollection()->getValue($this->getProperty('optinField'));
 
                 if (!empty($email) && (!empty($optin) || empty($this->getProperty('optinField')))) {

@@ -3,12 +3,12 @@
     "lowCaseName": "mailchimp",
     "description": "A MailChimp subscribe solution for MODX Revolution.",
     "author": "Oetzie.nl",
-    "version": "1.1.0-pl",
+    "version": "1.2.0-pl",
     "package":{
         "elements": {
             "snippets": [{
-                "name": "FormMailChimp",
-                "file": "formmailchimp.snippet.php"
+                "name": "mailChimpForm",
+                "file": "mailchimpform.snippet.php"
             }]
         },
         "systemSettings": [{

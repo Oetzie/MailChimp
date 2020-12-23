@@ -60,4 +60,20 @@ class MailChimpSnippets extends MailChimp
     {
         return $this->properties;
     }
+
+    /**
+     * @access public.
+     * @param Array $properties.
+     * @return Array.
+     */
+    public function getFormattedProperties(array $properties = [])
+    {
+        foreach (['mergeFields', 'aliasFields'] as $key) {
+            if (isset($properties[$key]) && !is_array($properties[$key])) {
+                $properties[$key] = json_decode($properties[$key], true);
+            }
+        }
+
+        return $properties;
+    }
 }
