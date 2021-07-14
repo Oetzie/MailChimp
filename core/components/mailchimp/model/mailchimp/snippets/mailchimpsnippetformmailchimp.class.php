@@ -8,7 +8,7 @@
 
 require_once dirname(__DIR__) . '/mailchimpsnippets.class.php';
 
-class MailChimpSnippetMailChimpForm extends MailChimpSnippets
+class MailChimpSnippetFormMailChimp extends MailChimpSnippets
 {
     /**
      * @access public.
@@ -85,6 +85,12 @@ class MailChimpSnippetMailChimpForm extends MailChimpSnippets
                         return true;
                     }
 
+                    if (isset($results['message'])) {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[FormMailChimp.' . $event . '] could not subscribe "' . $parameters['email_address'] . '" because "' . $results['message'] . '".');
+                    } else {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[FormMailChimp.' . $event . '] could not subscribe "' . $parameters['email_address'] . '".');
+                    }
+
                     $form->getValidator()->setError('error_message', $this->modx->lexicon('mailchimp.subscribe_failed'));
 
                     return false;
@@ -107,6 +113,12 @@ class MailChimpSnippetMailChimpForm extends MailChimpSnippets
 
                     if ((int) $results['code'] === 200) {
                         return true;
+                    }
+
+                    if (isset($results['message'])) {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[FormMailChimp.' . $event . '] could not unsubscribe "' . $parameters['email_address'] . '" because "' . $results['message'] . '".');
+                    } else {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, '[FormMailChimp.' . $event . '] could not unsubscribe "' . $parameters['email_address'] . '".');
                     }
 
                     $form->getValidator()->setError('error_message', $this->modx->lexicon('mailchimp.unsubscribe_failed'));

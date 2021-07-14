@@ -50,7 +50,7 @@ class MailChimp
             'css_url'               => $assetsUrl . 'css/',
             'assets_url'            => $assetsUrl,
             'connector_url'         => $assetsUrl . 'connector.php',
-            'version'               => '1.2.0',
+            'version'               => '1.3.0',
             'api_endpoint'          => $this->modx->getOption('mailchimp.api_endpoint', null, 'https://<dc>.api.mailchimp.com/3.0/'),
             'api_key'               => $this->modx->getOption('mailchimp.api_key')
         ], $config);
